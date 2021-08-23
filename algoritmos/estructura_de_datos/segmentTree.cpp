@@ -1,62 +1,121 @@
-#include <bits/stdc++.h>
+#include <bits/stdc++.h> 
 #define input freopen("in.txt", "r", stdin)
 #define output freopen("out.txt", "w", stdout)
-using namespace std;
+// Variables
+#define MAX_N 100010
 
-int[]numbers={1,2,3,4,5,6,7,8};
+using namespace std; 
+
+// Variables static
+
+int n, a[MAX_N];
+
 
 struct node{
-    int minimo;
-}segmentTree[10000000];
+    int sum, mult , min, max;
+}segmentTree[MAX_N*2];
 
-void init (int inicio, int fin, int nodoActual){
-    if(inicio=fin){
-        segmentTree[nodoActual].minimo=numbers[inicio];
-    }else{
-        int medio=(inicio+fin)/2;
-        int hijoIzq=2*nodoActual+1;
-        int hijoDer=2*nodoActual+2;
+void init(int inicio, int final, int nodoActual) { 
+    if( inicio == final ) {
+        segmentTree[nodoActual].max = a[inicio];
+        segmentTree[nodoActual].min = a[inicio];
+        segmentTree[nodoActual].sum = a[inicio];
+    } else {
+        int mid = (inicio + final) / 2; 
+        int nodoIzquierdo = 2 * nodoActual + 1; 
+        int nodoDerecho   = 2 * nodoActual + 2;
+        // Ir por lado izquierdo
+        init(inicio, mid, nodoIzquierdo );
+        // Ir por lado derecho 
+        init(mid+1, final, nodoDerecho);
 
-        //ir por izqu
-        init(inicio,medio,hijoIzq); 
-        //ir por derecha
-        init(medio+1, fin, hijoDer);
-
-        //Actualizar el nodo actual
-
-        segmentTree[nodoActual].min=min(segmentTree[hijoDer].minimo,segmentTree[hijoIzq].minimo)
-    }
+        segmentTree[nodoActual].sum = segmentTree[nodoIzquierdo].sum + segmentTree[nodoDerecho].sum;
+        segmentTree[nodoActual].max = max(segmentTree[nodoIzquierdo].max,  segmentTree[nodoDerecho].max);
+        segmentTree[nodoActual].min = min(segmentTree[nodoIzquierdo].min, segmentTree[nodoDerecho].min);
+    } 
 }
-node query(int inicio,int fin, int nodoActual,int i, int j){
-    if(inicio>=i && fin<=j){
+
+
+node query(int inicio, int final, int nodoActual, int izquierda, int derecha ) {
+    if(inicio >= izquierda && final <= derecha ) {
         return segmentTree[nodoActual];
-    }else{
-        int medio=(inicio+fin)/2;
-        int hijoIzq=2*nodoActual+1
-        int hijoDer=2*nodoActual+2;
-        if(j<=medio){
-            return query(ini,medio,hijoIzq,i,j);
+    }
+    
+    int mid = (inicio + final ) / 2; 
+    int nodoIzquierdo = 2 * nodoActual + 1; 
+    int nodoDerecho   = 2 * nodoActual + 2;
 
-        }else if(i>=medio){
-            return query(medio+1,fin,hijoDer,i,j);
-        }else{
-            node queryIzq=query(ini,medio,hijoIzq,i,j);
-            node queryIzq=query(ini,medio,hijoDer,i,j);
+    if(derecha <= mid ) {
+        return query(inicio, mid, nodoIzquierdo, izquierda, derecha); 
+    } else if(izquierda > mid) {
+        return query(mid+1, final, nodoDerecho, izquierda, derecha);
+    } else {
+        node maxIzquierdo = query(inicio, mid, nodoIzquierdo,izquierda,derecha);
+        node maxDerecho   = query(mid+1, final, nodoDerecho,izquierda,derecha);
 
-            node resultado;
-            resultado.maximo=max(queryIzq.max,queryDer.max);
-            resultado.minimo=min(queryIzq.min,queryDer.min);
+        node result ; 
+        result.max = max(maxIzquierdo.max, maxDerecho.max);
+        result.min = min(maxIzquierdo.min, maxDerecho.min); 
+        return result;
+    }      
+}
 
-            return resultado;
-            
-
-        }
-
+void update(int inicio, int final, int nodoActual, int posicion, int valor ) {
+    if(posicion < inicio && posicion > final ) {
+        return ; 
     }
 
+    if( inicio == final ) {
+        segmentTree[nodoActual].max = valor;
+        segmentTree[nodoActual].min = valor;
+        segmentTree[nodoActual].sum = valor;
+    } else { 
+
+        int mid = (inicio + final ) / 2; 
+        int nodoIzquierdo = 2 * nodoActual + 1; 
+        int nodoDerecho   = 2 * nodoActual + 2;
+        // Actualizar por lado izquierdo
+        update(inicio, mid, nodoIzquierdo, posicion, valor );
+        // Actualizar por lado derecho 
+        update(mid+1, final, nodoDerecho, posicion, valor );
+
+        segmentTree[nodoActual].sum = segmentTree[nodoIzquierdo].sum + segmentTree[nodoDerecho].sum;
+        segmentTree[nodoActual].max = max(segmentTree[nodoIzquierdo].max,  segmentTree[nodoDerecho].max); // -inf
+        segmentTree[nodoActual].min = min(segmentTree[nodoIzquierdo].min, segmentTree[nodoDerecho].min);  // inf
+
+    }
 }
-int main(){
-    init(0,3,0);
+
+int main() {
+    input;
+    cin>>n;
+    for(int i = 0; i < n; i++) {
+        cin>>a[i];
+    }
+    // Inicializar Segment Tree 
+    init(0,n -1, 0);    
+
+    for(int i=0;i<2*n;i++) {
+        cout<<"[ "<<segmentTree[i].sum<<" ]";
+    }
+    cout<<endl;
+    int queries;
+    cin>> queries; 
+    for(int i = 0 ;i <queries ; i++) {
+        int izquierda, derecha; 
+        cin>> izquierda >> derecha; 
+        cout<<"El maximo de "<<izquierda<<" y "<< derecha << " es: "<<query(0,n-1,0,izquierda,derecha).max<<endl;
+    }
+
+    update(0,n-1,0,5,8);
+    cout<<"El maximo de "<<0<<" y "<< 6 << " es: "<<query(0,n-1,0,0,6).max<<endl;
+
+
+
+
+    /* if('max' == consulta) {
+
+    }*/
     return 0;
-    query(0,7,0,6,7);
 }
+
