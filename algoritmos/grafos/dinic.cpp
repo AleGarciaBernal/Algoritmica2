@@ -1,8 +1,3 @@
-/*
- Petar 'PetarV' Velickovic
- Algorithm: Dinic's Algorithm
-*/
-
 #include <stdio.h>
 #include <math.h>
 #include <string.h>
@@ -124,18 +119,29 @@ inline void addEdge(int u, int v, int cap)
     E.push_back(E2);
 }
 
-int main()
-{
-    v = 4, e = 5;
-    s = 1, t = 4;
+int main(){
+    int nroCases;
+    while(cin>>v && v) {
+   // int s,t;   // s = fuente o source t = terminal 
+    cin>>s>>t>>e;
+    //memset(grafo,0,sizeof(grafo));
+     //for(int i=0;i<e;i++) {
+       // int from, to, capacity; 
+        //cin>>from>>to>>capacity;
+        //grafo[from][to] = capacity;          // camino capacidad
+        //grafo[to][from] = 0;                //  flujo camino residual 
+    }
+    cout << "Network " << nroCases++ << endl;
+    cout<<"The bandwidth is "<<Dinic()<<"."<<endl<<endl;;
+}    
+
+
+    //v = 4, e = 5;
+    //s = 1, t = 4;
     
-    addEdge(1, 2, 40);
-    addEdge(1, 4, 20);
-    addEdge(2, 4, 20);
-    addEdge(2, 3, 30);
-    addEdge(3, 4, 10);
+    //addEdge(1, 2, 40);
+    //addEdge(1, 4, 20);
+    //addEdge(2, 4, 20);
+    //addEdge(2, 3, 30);
+    //addEdge(3, 4, 10);
     
-    printf("%d\n",Dinic());
-    
-    return 0;
-}
